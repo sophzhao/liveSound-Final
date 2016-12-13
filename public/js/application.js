@@ -1,41 +1,80 @@
 $(document).ready(function() {
 
-//------------------------------SONGS FUNCTIONALITY-------------------------------------------
+//------------------------------ARTISTS FUNCTIONALITY-------------------------------------------
 	
-	// $('button').click(function() {
- //  		var id = $(this).id;
- //  		console.log(id);
-	// });
+//CRUD functionality for grocery lists
+    $('#new').submit(addItem);
+    $('#find').on('click', findItem);
+    $('#update').submit(updateItem);
+    $('input[type="button"]').on('click', deleteItem);
 
-	//Create functionality for songs
-	$('#requestSong').submit(addSong);
+    function addItem(event) {
+        var item_name = $('#new input')[0].value;
+        var quant = $('#new input')[1].value;
+        $.ajax({
+            url: './artists',
+            type: 'PUT',
+            data: { name: item_name, quantity: quant },
+            success: function(result) {
+                console.log("Successfully added item to grocery list!");
+                window.location.reload(true);
+            }
+        });
+        event.preventDefault();
+    }
 
-	//show a user's songs when they are on the song page
-	$.ajax({
-			url: './songs',
-			type: 'GET',
-			success:function(result) {
-				$('#mysongs').html(result);
-			}
-		});
+    function findItem(event) {
+        var item_name = $('#custom-search-input input')[0].value;
+        $.ajax({
+            url: './artists',
+            type: 'GET',
+            data: { name: item_name },
+            success: function(result) {
+                console.log("Successfully found item!");
+                $('#founditem').html(result);
+            },
+            error: function(response, status) {
+                $('#founditem').html('<p>Item not found, please try another search!</p>');
+            }
+        });
+        event.preventDefault();
+    }
 
-	function addSong(event) {
-		var genre = $('#genre').val();
-		var lyrics = $('#lyrics').val();
-		var tempo = $('input[type="radio"][name="speed"]:checked').val();
-		var age = $('#age').val();
-		var location = $('#location').val();
-		var extras = $('#extras').val();
-		var answer = null;
-		$.ajax({
-			url: './songs',
-			type: 'PUT',
-			data: { genre: genre, lyrics: lyrics, tempo: tempo, age: age, location: location, extras: extras, answer: answer },
-			success: function(result) {
-				$('#success').html(result);
-			}
-		});
-	}
+    function updateItem(event) {
+        console.log("update Item called");
+        var item_name = $('#update input')[0].value;
+        var quant = $('#update input')[1].value;
+        $.ajax({
+            url: './artists',
+            type: 'POST',
+            data: { filter: item_name, update: quant },
+            success: function(result) {
+                console.log("Successfully updated item in grocery list!");
+                window.location.reload(true);
+            }
+        });
+        event.preventDefault();
+    }
+
+    function deleteItem() {
+        //go through 'td' elements to find name of item in the row
+        var item_name = $(this).closest('tr td').prev('td').prev('td').prev('td').text();
+        //remove any line breaks from item_name
+        item_name = item_name.replace(/\s{2,}/g, '');
+        item_name = item_name.replace(/\t/g, '');
+        item_name = item_name.replace(/(\r\n|\n|\r)/g,"");
+        $.ajax({
+            url: './artists',
+            type: 'DELETE',
+            data: { name: item_name },
+            success:function(result){
+                console.log("Successfully deleted item");
+                window.location.reload(true);
+            }
+        });
+        event.preventDefault();
+    }
+
 
 //-----------------------------USER LOGIN AND REGISTRATION CR FUNCTIONALITY----------------------------------------
 
@@ -93,47 +132,7 @@ $(document).ready(function() {
 		event.preventDefault();
 	}
 
-//------------------------------GAMEPLAY FUNCTIONALITY-------------------------------------------
 
-	$('#next').on('click', gamePlay);
-	$('#answerSong').submit(answerSong);
-
-	function gamePlay() {
-		$('#game').html('');
-		var game_display = '<center>'
-		$('#game').append(game_display);
-		$.ajax({
-			url: './rand_song',
-			type: 'GET',
-			success: function(result) {
-				$('#game').append(result);
-			},
-			error: function(response, status) {
-				console.log(response);
-				alert("Game currently not functioning. We are sorry for the inconvenience!");
-			}
-		});
-	}
-
-	function answerSong(event) {
-		event.preventDefault();
-		var song = $('#answerSong input')[0].value;
-		var user = $('#hiddenuser input')[0].value;
-		if (song == "") {
-			gamePlay();
-		}
-		else {
-			$.ajax({
-				url: './answers',
-				type: 'PUT',
-				data: { requested_by: user, answer: song },
-				success: function(result) {
-					gamePlay();
-					$('#name').val("");
-				}
-			});
-		}
-	}
 
 //------------------------------ANSWERS FUNCTIONALITY-------------------------------------------
 	

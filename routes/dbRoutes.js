@@ -176,13 +176,9 @@ doRetrieve = function(req, res){
    *    model once the retrieve has been successful.
    * modelData is an array of objects returned as a result of the Retrieve
    */
-  if (req.params.collection == "songs") {
+  if (req.params.collection == "artists") {
     /* add current user in session as attribute to search for in document */
     req.query.username = req.session.user;
-  }
-  if (req.params.collection == "answers") {
-    /* add current user in session as attribute to search for in document */
-    req.query.requested_by = req.session.user;
   }
   mongoModel.retrieve(
     req.params.collection, 
@@ -194,11 +190,11 @@ doRetrieve = function(req, res){
           req.session.user = req.query.username;
           res.render('user_results',{obj: modelData});
         }
-        else if (req.params.collection == "songs") {
+        else if (req.params.collection == "saved") {
           res.render('mysongs_results',{obj: modelData});
         }
-        else if (req.params.collection == "answers") {
-          res.render('my_answers', {obj: modelData});
+        else if (req.params.collection == "artists") {
+          res.render('favorites', {obj: modelData});
         }
       } 
       else {
