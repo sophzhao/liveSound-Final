@@ -2,7 +2,31 @@
 <html lang="en">
 
 <head>
-    <% include ./partials/head %>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>liveSound</title>
+
+  <!-- Bootstrap Core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="css/style.css" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+
+  <!-- jQuery -->
+  <script src="js/jquery.js"></script>
+  <script src="js/application.js"></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <script src="js/bootstrap.min.js"></script>
+
 </head>
 
 <body>
@@ -14,58 +38,28 @@
                   <hr>
                   <h2 class="intro-text text-center"><strong>Favorite Artists</strong></h2>
                   <hr>
-
                   <div id="custom-search-input">
                       <div class="input-group col-md-12">
-                          <input type="text" id="search-text" class="  search-query form-control" placeholder="Search" />
-                          <span class="input-group-btn">
-                              <button id="find" class="btn btn-danger" type="button">
-                                  <span class=" glyphicon glyphicon-search"></span>
-                              </button>
-                          </span>
+
                       </div>
                   </div>
                   <br>
                   <div id="founditem"></div>
                   <br>
 
-                  <div id="allArtists"></div>
-                	
-                  <!-- Edit Modal -->
-                  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" 
-                     aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <!-- Modal Header -->
-                              <div class="modal-header">
-                                  <button type="button" class="close" 
-                                     data-dismiss="modal">
-                                         <span aria-hidden="true">&times;</span>
-                                         <span class="sr-only">Close</span>
-                                  </button>
-                                  <h4 class="modal-title" id="myModalLabel">
-                                      Edit Artist
-                                  </h4>
-                              </div>
-                            <!-- Modal Body -->
-                            <div class="modal-body">
-                              <form id="update">
-                                <input type="text" id="artist" placeholder="Artist" required></input><br>
-                                <input type="text" id="ranking" placeholder="Ranking" required></input><br><br>
-                                <input type="submit" value="Edit Artist" class="btn btn-primary">
-                              </form>               
-                            </div>
-                        </div>
-                    </div>
-                  </div> <!-- edit modal -->
-                </div>
-                <div class="col-lg-6">
+                  <div id="allItems"></div>
+  
+                  <center>
                   <form id="new">
-                    <input type="text" id="artist" placeholder="New Artist" required></input>
+                    <input type="text" id="artist" placeholder="Artist" required></input>
                     <input type="text" id="ranking" placeholder="Ranking" required></input>
-                    <input type="submit" value="Add Artist" class="btn btn-primary">
+                    <input type="submit" value="Add Item" class="btn btn-primary">
                   </form>
-                </div>
+                  <form id="get_top">
+                    <input type="submit" value="Your #1 Artist" class="btn btn-primary">
+                    <p><span id="get_answer"></span></p>
+                  </form>
+                  </center>
             </div>
         </div>
 
@@ -73,7 +67,13 @@
     <!-- /.container -->
 
     <footer>
-        <% include ./partials/footer %>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 text-center">
+              <p>Copyright &copy; 2016 Sophie Zhao</p>
+            </div>
+          </div>
+        </div>
     </footer>
 
   </body>

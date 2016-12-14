@@ -2,39 +2,48 @@ $(document).ready(function() {
 
 //------------------------------ARTISTS FUNCTIONALITY-------------------------------------------
 	
-//CRUD functionality for grocery lists
-    $('#new').submit(addItem);
-    $('#find').on('click', findItem);
-    $('#update').submit(updateItem);
-    $('input[type="button"]').on('click', deleteItem);
+//CRUD functionality for artist rankings
+    $('#new').submit(createItem);
+    $('#get_top').submit(getItem);
+    $('#post').submit(updateItem);
+    $('#delete').submit(deleteItem);
 
-    function addItem(event) {
-        var item_name = $('#new input')[0].value;
-        var quant = $('#new input')[1].value;
+    function createItem(event) {
+        var artist = document.getElementById('artist').value;
+        var rank = document.getElementById('ranking').value;
         $.ajax({
             url: './artists',
             type: 'PUT',
-            data: { name: item_name, quantity: quant },
+            data: { artist: artist, rank: rank },
             success: function(result) {
-                console.log("Successfully added item to grocery list!");
+                console.log("Added a favorite!");
                 window.location.reload(true);
             }
         });
         event.preventDefault();
     }
 
-    function findItem(event) {
-        var item_name = $('#custom-search-input input')[0].value;
+    // Get all artists ajax call
+    $("#get_all").submit(function(event) {
+        $.get('/artist', function(html) {
+            $('#all_results').html(html);
+        });
+        event.preventDefault();
+    });
+
+    function getItem(event) {
+        console.log("get");
+        var rank = 1;
         $.ajax({
             url: './artists',
             type: 'GET',
-            data: { name: item_name },
+            data: { rank: rank },
             success: function(result) {
-                console.log("Successfully found item!");
-                $('#founditem').html(result);
+                console.log(result);
+                $('#get_answer').html(result);
             },
             error: function(response, status) {
-                $('#founditem').html('<p>Item not found, please try another search!</p>');
+                $('#get_answer').html('1 : The Fray');
             }
         });
         event.preventDefault();
@@ -49,7 +58,7 @@ $(document).ready(function() {
             type: 'POST',
             data: { filter: item_name, update: quant },
             success: function(result) {
-                console.log("Successfully updated item in grocery list!");
+                console.log("Successfully updated item in artist list!");
                 window.location.reload(true);
             }
         });
@@ -75,21 +84,13 @@ $(document).ready(function() {
         event.preventDefault();
     }
 
-
-//-----------------------------USER LOGIN AND REGISTRATION CR FUNCTIONALITY----------------------------------------
-
-	//CR functionality for users
+//
+//
+// USERS 
+//
+//
 	$('#login').submit(login_user); //read logged in user
 	$('#register').submit(new_user); //create new user
-
-	// //show leaderboard when user loads / is on the home page
-	// $.ajax({
-	// 		url: './allusers',
-	// 		type: 'GET',
-	// 		success:function(result) {
-	// 			$('#leaderboard').html(result);
-	// 		}
-	// 	});
 
 	function login_user(event) {
 		var user_name = $('#login input')[0].value;
@@ -100,7 +101,8 @@ $(document).ready(function() {
 			data: { username: user_name, password: user_password },
 			success: function(result) {
 				if (result.length == 0) {
-					$('#error').html("<p>Incorrect username or password. Please try again!</p>");
+					$('#error').html("<p>Incorrect username or password. Please try again.</p>");
+                    window.location.reload(true);
 				}
 				console.log("Successfully found user!");
 				console.log(user_name, user_password)
@@ -132,23 +134,25 @@ $(document).ready(function() {
 		event.preventDefault();
 	}
 
-
-
-//------------------------------ANSWERS FUNCTIONALITY-------------------------------------------
+//
+//
+// SEATGEEK API CALLS
+//
+//
 	
-	//API Call: Search for recipes using 3 leftover ingredients submitted by users
+	// Find the ID of a preferenced performer
 	$('#upcoming').submit(getPerformerResults);
+    $('#upcoming_geo').submit(getFromLocation);
+    $('#favorite').submit(getFavResults);
 
-	//Perform GET recipe functions for finding recipe IDs, then SEARCH recipe function to get ingredients
 	function getPerformerResults(event) {
 		var performer_q = $('#upcoming input')[0].value;
 
-		//clear search inputs
 		$('#upcoming input')[0].value = "";
 		console.log(performer_q);
 
-		//below information received from API documentation
-		//following example pattern of: http://api.yummly.com/v1/api/recipes?_app_id=YOUR_ID&_app_key=YOUR_APP_KEY
+		// https://api.seatgeek.com/2/events?client_id=MYCLIENTID&client_secret=MYCLIENTSECRET
+        // Query to find ID 
 		try{
 			$.ajax({ 
 			url: 'https://api.seatgeek.com/2/performers', 
@@ -165,10 +169,9 @@ $(document).ready(function() {
             		$('#upcoming_results').append("<p>Sorry we could not find any performers with those keywords. Please try another search!</p>");
             	}
             	else {
-            		console.log(result.performers[0])
+                    // Get more event information if ID exists
             		performer_id = result.performers[0].id;
             		searchPerformerEvents(performer_id);
-            		// searchRecipes(result.matches); //calls function to search for recipes using result IDs
             	}
             },
             error: function(response){
@@ -180,6 +183,7 @@ $(document).ready(function() {
 		} catch (e) {console.log(e.description);}
 	}
 
+    // Search for the recommended events of performer
 	function searchPerformerEvents(performer_id) {
 
 		try{
@@ -199,9 +203,8 @@ $(document).ready(function() {
             		$('#upcoming_results').append("<p>Sorry we could not find any performers with those keywords. Please try another search!</p>");
             	}
             	else {
-            		console.log(result.recommendations)
+                    // Display recommendations in HTML
             		displayRecs(result.recommendations)
-            		// searchRecipes(result.matches); //calls function to search for recipes using result IDs
             	}
             },
             error: function(response){
@@ -214,21 +217,157 @@ $(document).ready(function() {
 		}
 	}
 
+    // Piece together HTML to display the information
 	function displayRecs(recommendations) {
 		var html = "<div class='row'>"
 		$.each(recommendations, function() {
 			concert = this;
 			html+= "<div class='col-sm-6'><div class='card card-block'>";
 			html+="<h3 class='card-title'>"+concert.event.title+"</h3><p class='card-text'>"+concert.event.datetime_local+"</p>";
-			html+="<a href="+concert.event.url+" class='btn btn-primary'>Get Tickets</a>"
-			html+="<input type='button' class='btn btn-primary' id='"+concert.event.id+"'>Interested!</input></div></div>"
+			html+="<a href="+concert.event.url+" class='btn btn-primary'>Get Tickets</a></div></div>"
+			// html+="<button class='btn btn-primary' id='"+concert.event.id+"'>Interested!</button></div></div>"
 		});
 		html+="</div>"
 		$('#upcoming_results').append(html);
 		
 	}
 
-	$('input[type="button"]').on('click', saveEvent);
+    // API Call to get events according to your IP Address location
+    function getFromLocation() {
+        // Query to find events near you geographically
+        try{
+            $.ajax({ 
+            url: 'https://api.seatgeek.com/2/events', 
+            type: 'GET',
+            data: {
+                "geoip": true,
+                "client_id": "NjQxNzM2MnwxNDgxNjQ2MjUx",
+                "client_secret": "yJIfLxYsZj1mkHwc1LD9wExA-X8HGGWGHOkoOZlo"
+            }, 
+            success: function(result) {
+                $('#upcoming_results').empty();
+                console.log('successfully called ajax for performer search!');
+                if (result.length == 0) {
+                    $('#upcoming_results').append("<p>Sorry we could not find any performers with those keywords. Please try another search!</p>");
+                }
+                else {
+                    // Get more event information if ID exists
+                    console.log(result);
+                    displayEvents(result.events)
+;                }
+            },
+            error: function(response){
+                console.log(response);                
+            },
+            dataType: "json",
+            });
+            return false;
+        } catch (e) {console.log(e.description);}
+    }
+
+
+    // Display the events (not recommendations)
+    function displayEvents(events) {
+        var html = "<div class='row'>"
+        $.each(events, function() {
+            concert = this;
+
+            html+= "<div class='col-sm-6'><div class='card card-block'>";
+            html+="<h3 class='card-title'>"+concert.title+"</h3><p class='card-text'>"+concert.datetime_local+"</p><p class='card-text'>"+concert.venue.address+" "+concert.venue.city+"</p>";
+            html+="<a href="+concert.url+" class='btn btn-primary'>Get Tickets</a></div></div>"
+            // html+="<button class='btn btn-primary' id='"+concert.event.id+"'>Interested!</button></div></div>"
+        });
+        html+="</div>"
+        $('#upcoming_results').append(html);
+        
+    }
+
+
+    function getFavResults(event) {
+        var performer_q = 'The+Fray';
+
+        console.log(performer_q);
+
+        // https://api.seatgeek.com/2/events?client_id=MYCLIENTID&client_secret=MYCLIENTSECRET
+        // Query to find ID 
+        try{
+            $.ajax({ 
+            url: 'https://api.seatgeek.com/2/performers', 
+            type: 'GET',
+            data: {
+                "q": performer_q,
+                "client_id": "NjQxNzM2MnwxNDgxNjQ2MjUx",
+                "client_secret": "yJIfLxYsZj1mkHwc1LD9wExA-X8HGGWGHOkoOZlo"
+            }, 
+            success: function(result) {
+                $('#favorite_results').empty();
+                console.log('successfully called ajax for performer search!');
+                if (result.length == 0) {
+                    $('#favorite_results').append("<p>Sorry we could not find any performers with those keywords. Please try another search!</p>");
+                }
+                else {
+                    // Get more event information if ID exists
+                    performer_id = result.performers[0].id;
+                    searchFavPerformerEvents(performer_id);
+                }
+            },
+            error: function(response){
+                console.log(response);                
+            },
+            dataType: "json",
+            });
+            return false;
+        } catch (e) {console.log(e.description);}
+    }
+
+    // Search for the recommended events of performer
+    function searchFavPerformerEvents(performer_id) {
+
+        try{
+            $.ajax({ 
+            url: 'https://api.seatgeek.com/2/recommendations', 
+            type: 'GET',
+            data: {
+                "performers.id": performer_id,
+                "geoip": true,
+                "client_id": "NjQxNzM2MnwxNDgxNjQ2MjUx",
+                "client_secret": "yJIfLxYsZj1mkHwc1LD9wExA-X8HGGWGHOkoOZlo"
+            }, 
+            success: function(result) {
+                $('#favorite_results').empty();
+                console.log('successfully called ajax for performer rec search!');
+                if (result.length == 0) {
+                    $('#favorite_results').append("<p>Sorry we could not find any performers with those keywords. Please try another search!</p>");
+                }
+                else {
+                    // Display recommendations in HTML
+                    displayFavEvents(result.recommendations)
+                }
+            },
+            error: function(response){
+                console.log(response);                
+            },
+            dataType: "json",
+            });
+            return false;
+        } catch (e) {console.log(e.description);
+        }
+    }
+
+    // Display the events (not recommendations)
+    function displayFavEvents(events) {
+        var html = "<div class='row'>"
+        $.each(events, function() {
+            concert = this;
+            html+= "<div class='col-sm-6'><div class='card card-block'>";
+            html+="<h3 class='card-title'>"+concert.event.title+"</h3><p class='card-text'>"+concert.event.datetime_local+"</p>";
+            html+="<a href="+concert.event.url+" class='btn btn-primary'>Get Tickets</a></div></div>"
+            // html+="<button class='btn btn-primary' id='"+concert.event.id+"'>Interested!</button></div></div>"
+        });
+        html+="</div>"
+
+        $('#favorite_results').append(html);
+    }
 
 	function saveEvent(concert){
 		console.log(concert);

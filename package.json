@@ -1,7 +1,7 @@
 {
-  "name": "JamSeek_Final_Project",
+  "name": "liveSound-final-project",
   "version": "1.0.0",
-  "description": "Find songs using the crowd.",
+  "description": "Query for recommended and nearby events.",
   "keywords": [
     "OpenShift",
     "Node.js",
@@ -9,7 +9,7 @@
     "openshift"
   ],
   "author": {
-    "name": "Nikita Bokil, Akash Kejriwal, Sophie Zhao"
+    "name": "Sophie Zhao"
   },
   "repository": {
     "type": "git",
@@ -32,5 +32,8 @@
   "bundleDependencies": [],
   "private": true,
   "main": "app.js",
-  "start": "node app.js"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  }
 }

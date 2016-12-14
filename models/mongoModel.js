@@ -3,6 +3,7 @@
  * To install:  npm install mongodb --save
  */
 var mongoClient = require('mongodb').MongoClient;
+var bcrypt = require('bcryptjs'); //used for encrypting password
 
 /*
  * This connection_string is for mongodb running locally.
@@ -50,6 +51,11 @@ mongoClient.connect('mongodb://'+connection_string, function(err, db) {
  */
 exports.create = function(collection, data, callback) {
   console.log("4. Start insert function in mongoModel");
+  if (collection == "users") {
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(data.password, salt);
+    data.password = hash;
+  }
   // Do an asynchronous insert into the given collection
   mongoDB.collection(collection).insertOne(
     data,                     // the object to be inserted
@@ -81,12 +87,36 @@ exports.retrieve = function(collection, query, callback) {
    * iteration does the actual retrieve. toArray asynchronously retrieves the
    * whole result set and returns an array.
    */
-  mongoDB.collection(collection).find(query).toArray(function(err, docs) {
-    if (err) doError(err);
-    // docs are MongoDB documents, returned as an array of JavaScript objects
-    // Use the callback provided by the controller to send back the docs.
-    callback(docs);
-  });
+  if (collection == "users") {
+    var user = query.username;
+    var search = {};
+    search.username = user;
+    mongoDB.collection(collection).find(search).toArray(function(err, docs) {
+      //If no users found, callback empty []
+      if (docs.length == 0) {
+        callback(docs);
+      }
+      //If users found (should only be 1 user since username is unique!), check if password matches hash password
+      else {
+        var password = docs[0].password;
+        var match = bcrypt.compareSync(query.password, password);
+        if (match == true) {
+          callback(docs);
+        }
+        else {
+          callback([]);
+        }
+      }
+    });
+  }
+  else{
+    mongoDB.collection(collection).find(query).toArray(function(err, docs) {
+      if (err) doError(err);
+      // docs are MongoDB documents, returned as an array of JavaScript objects
+      // Use the callback provided by the controller to send back the docs.
+      callback(docs);
+    });
+  }
 }
 
 /********** CRUD Update -> Mongo updateMany ***********************************

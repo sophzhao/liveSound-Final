@@ -8,15 +8,16 @@ exports.init = function(app) {
   app.get('/logout', logout); // Log out user and end session
   app.get('/favorites', favorites); // The favorites page
   app.get('/upcoming', upcoming); //The request song page
-  app.get('/song', song); //The songs page that displays your songs
 
   //Retrieve all users for leaderboard
-  app.get('/allusers', retrieveUsers); //CRUD Retrieve ALL
+  app.get('/allArtists', getAllArtists);; //CRUD Retrieve ALL
     
   // The collection parameter maps directly to the mongoDB collection
   app.put('/:collection', doCreate); // CRUD Create
   app.get('/:collection', doRetrieve); // CRUD Retrieve for single user
   app.post('/:collection', doUpdate); // CRUD Update
+  app.delete('/:collection', doDelete); // CRUD Delete 
+
 }
 
 //------------------------------ROUTE CALLS FOR STATIC PAGES-------------------------------------------
@@ -87,6 +88,13 @@ song = function(req, res) {
  * Take the object defined in the request body and do the Create
  * operation in mongoModel.
  */ 
+
+getAllArtists = function(request, response) {
+    var message = 'All Artists';
+    response.render('allArtists', {'title': message, 
+                                    'allArtistsData':Artists.Collection});
+}
+
 doCreate = function(req, res){
   /*
    * First check if req.body has something to create.
@@ -118,47 +126,10 @@ doCreate = function(req, res){
                       function(result) {
                         // result equal to true means create was successful
                         var success = (result ? "Create successful" : "Create unsuccessful");
-                        if (req.params.collection == "songs") {
-                          res.render('message', {obj: "Your song has successfully been entered for gameplay!"});
-                        }
-                        else if (req.params.collection == "answers") {
-                          res.render('message', {obj: "Your song was answered!"});
-                        }
-                        else {
-                          res.render('message', {obj: success});
-                        }
+                        res.render('message', {title: 'Mongo Demo', obj: success});
                       });
 }
 
-retrieveUsers = function(req, res){
-  mongoModel.retrieveAll(
-    "users",
-    function(modelData) {
-      if (modelData.length) {
-        res.render('leaderboard_results', {obj: modelData});
-      }
-      else {
-        var message = "No search results found. Please try again!";
-        res.render('message', {obj: message});
-      }
-  });
-}
-
-randSong = function(req, res) {
-  req.query.user = req.session.user;
-  mongoModel.retrieveSong(
-    "songs",
-    req.query,
-    function(modelData) {
-      if (modelData.length) {
-        res.render('display_rand_song', {obj: modelData});
-      }
-      else {
-        var message = "Game currently not functioning. We are sorry for the inconvenience!";
-        res.render('message', {obj: message});
-      }
-    });
-}
 
 /********** CRUD Retrieve (or Read) *******************************************
  * Take the object defined in the query string and do the Retrieve
@@ -176,6 +147,7 @@ doRetrieve = function(req, res){
    *    model once the retrieve has been successful.
    * modelData is an array of objects returned as a result of the Retrieve
    */
+   console.log(req.params.collection);
   if (req.params.collection == "artists") {
     /* add current user in session as attribute to search for in document */
     req.query.username = req.session.user;
@@ -190,11 +162,9 @@ doRetrieve = function(req, res){
           req.session.user = req.query.username;
           res.render('user_results',{obj: modelData});
         }
-        else if (req.params.collection == "saved") {
-          res.render('mysongs_results',{obj: modelData});
-        }
         else if (req.params.collection == "artists") {
-          res.render('favorites', {obj: modelData});
+          console.log("results");
+          res.render('results', {title: "This is title", obj: modelData});
         }
       } 
       else {
@@ -239,4 +209,24 @@ doUpdate = function(req, res){
               				  res.render('message',{title: 'Mongo Demo', obj: status});
 		                  });
 }
+
+doDelete = function(req, res){
+  /*
+   * Call the model Delete with:
+   *  - The collection to Delete from
+   *  - The object to delete in the model, from the request query string
+   *  - As discussed above, an anonymous callback function to be called by the
+   *    model once the delete has been successful.
+   * modelData is an array of objects returned as a result of the Retrieve
+   */
+
+  mongoModel.delete ( req.params.collection, 
+                      req.body,
+                      function(result) {
+                        // result equal to true means delete was successful
+                        var success = (result ? "Delete successful" : "Delete unsuccessful");
+                        res.render('message', {title: 'Mongo Demo', obj: success});
+                      });
+}
+
 

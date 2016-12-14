@@ -1,9 +1,13 @@
-# JamSeek
-Using the crowd to find songs!
+# liveSound
+One stop encouragement for live music! 
 
-## Synopsis
+## Summary
 
-JamSeek is an application developed in Node.js that uses the Express framework. The application uses the crowd as a supplement to traditional music recognition apps like Soundhound or Shazam, allowing users to input song attributes and play a game to identify them. The application was designed for 05-499: Crowd Programming at Carnegie Mellon University.
+liveSound is built on Node.js, Express, MongoDB and the SeatGeek API. 
+
+The SeatGeek API provided information about events based on geolocation, as well as results from intelligent searching (i.e. recommendation query responses). This app uses the geoid lookup for nearby events as well as recommended lookup based on past favorites and current taste. 
+
+Developed for Carnegie Mellon University's 67-328: Mobile to Cloud: Distributed Apps Fall 2016. 
 
 ## Installation via NPM
 
@@ -20,7 +24,3 @@ npm install morgan
 ## License
 
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
-
-## Demo
-
-http://jamseek-nbokil.rhcloud.com/

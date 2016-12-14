@@ -1,6 +1,8 @@
 <% if (username != false ) { %>
-    <div id="welcome"><p>Welcome <%= username %>! <a href="/logout">Logout</a></p></div>
+    <div id="welcome"><p><%=username %> is logged in-- <a href="/logout">LOGOUT</a></p></div>
+
 <% } %>
+<br>
 <div class="brand">liveSound</div>
     <div class="address-bar">Experience Music</div>
 
@@ -26,13 +28,10 @@
                         <a href="/home">Home</a>
                     </li>
                     <li>
-                        <a href="/upcoming">Upcoming</a>
+                        <a href="/upcoming">Upcoming Concerts</a>
                     </li>
                     <li>
-                        <a href="/favorites">View/Add Favorites</a>
-                    </li>
-                    <li>
-                        <a href="/saved">See Saved Shows</a>
+                        <a href="/favorites">Add Favorites</a>
                     </li>
                 </ul>
             </div>
