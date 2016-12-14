@@ -20,10 +20,14 @@ exports.init = function(app) {
 
 }
 
-//------------------------------ROUTE CALLS FOR STATIC PAGES-------------------------------------------
+//
+//
+// PAGE ROUTING 
+//
+//
 
-// Home page: if user is not logged in, have them log in or register
-// Else, render normal homepage
+// Home page: if user is not logged in, have them authenticate
+// Otherwise, render homepage
 homepage = function(req, res) {
   console.log(req.session.user);
   if ( req.session.user == undefined) {
@@ -34,7 +38,7 @@ homepage = function(req, res) {
   }
 };
 
-// Logout user and end session, redirecting them to homepage to log in
+// logout & end session, redirecting them to homepage
 logout = function(req, res) {
   req.session.reset();
   res.redirect('/home');
@@ -50,7 +54,7 @@ about = function(req, res) {
   }
 };
 
-// Favorites page that shows favs
+// Favorites page that shows favorite artists
 favorites = function(req, res) {
   if ( req.session.user == undefined) {
     res.render('homepage', { username: false } );
@@ -60,8 +64,7 @@ favorites = function(req, res) {
   }
 };
 
-// Path for user to enter a song
-// A user can enter multiple songs and see if they are answered on the songs page
+// Path for user query upcoming events
 upcoming = function(req, res) {
   if ( req.session.user == undefined) {
     res.render('homepage', { username: false } );
@@ -71,18 +74,11 @@ upcoming = function(req, res) {
   }
 };
 
-// Path for user to see songs they have requested
-// A user can see multiple songs on this page, including a history of songs
-song = function(req, res) {
-  if ( req.session.user == undefined) {
-    res.render('homepage', { username: false } );
-  }
-  else {
-    res.render('all_songs', { username: req.session.user } );
-  }
-};
-
-//------------------------------ROUTE CALLS FOR CRUD FUNCTIONATLITY-------------------------------------------
+//
+//
+// APP CRUD FUNCTIONALITY
+//
+//
 
 /********** CRUD Create *******************************************************
  * Take the object defined in the request body and do the Create

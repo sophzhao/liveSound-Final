@@ -1,6 +1,10 @@
 $(document).ready(function() {
 
-//------------------------------ARTISTS FUNCTIONALITY-------------------------------------------
+//
+//
+// ARTISTS FUNCTIONALITY
+//
+//
 	
 //CRUD functionality for artist rankings
     $('#new').submit(createItem);
@@ -86,7 +90,7 @@ $(document).ready(function() {
 
 //
 //
-// USERS 
+// USERS LOGIN/CREATE
 //
 //
 	$('#login').submit(login_user); //read logged in user
@@ -282,7 +286,7 @@ $(document).ready(function() {
         
     }
 
-
+    // Retrieve the favorite artist's recommended events on homepage
     function getFavResults(event) {
         var performer_q = 'The+Fray';
 
